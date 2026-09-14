@@ -1,0 +1,56 @@
+{
+  "instagramUsername": "your_username",
+  "instagramPassword": "your_password",
+  "posts": [
+    {
+      "id": "post_001",
+      "photoPath": "class001.jpg",
+      "classTitle": "창의미술 수업",
+      "description": "아이들과 함께 자유로운 그림 그리기를 통해 창의력을 키웠습니다",
+      "learningOutcomes": "색채 표현력 향상\n자신감 증진\n감정 표현 능력 발달",
+      "highlights": "자유로운 드로잉 연습\n색상 조화 학습\n작품 발표회",
+      "uploadTime": "14:30",
+      "uploadDate": "2026-09-10"
+    },
+    {
+      "id": "post_002",
+      "photoPath": "class002.jpg",
+      "classTitle": "과학 실험",
+      "description": "물의 상태 변화를 직접 관찰하며 과학 원리를 배웠습니다",
+      "learningOutcomes": "관찰력 향상\n논리적 사고력 개발\n과학적 실험 방법 습득",
+      "highlights": "얼음 녹이기 실험\n수증기 관찰\n결과 기록 및 토론",
+      "uploadTime": "15:30",
+      "uploadDate": "2026-09-10"
+    },
+    {
+      "id": "post_003",
+      "photoPath": "class003.jpg",
+      "classTitle": "책 읽기와 토론",
+      "description": "함께 책을 읽고 등장인물의 마음을 이해하는 시간을 가졌습니다",
+      "learningOutcomes": "독해 이해력 증진\n비판적 사고력 발달\n표현력 향상",
+      "highlights": "그룹별 책 토론\n마음 느끼기 활동\n감상문 공유",
+      "uploadTime": "16:30",
+      "uploadDate": "2026-09-10"
+    },
+    {
+      "id": "post_004",
+      "photoPath": "class004.jpg",
+      "classTitle": "음악 수업",
+      "description": "악기 연주와 함께 리듬감과 음악적 감성을 발달시켰습니다",
+      "learningOutcomes": "음악 감수성 향상\n협력 능력 발달\n자신감 증진",
+      "highlights": "악기 체험\n리듬 게임\n함께 연주하기",
+      "uploadTime": "17:00",
+      "uploadDate": "2026-09-10"
+    },
+    {
+      "id": "post_005",
+      "photoPath": "class005.jpg",
+      "classTitle": "현장 체험학습",
+      "description": "직접 동물들을 관찰하고 생태계에 대해 배우는 현장 체험을 했습니다",
+      "learningOutcomes": "생태계 이해\n동물 생활 습성 학습\n환경보호 의식 고취",
+      "highlights": "동물 관찰 일지 작성\n생활 습성 이해\n환경보호 토론",
+      "uploadTime": "17:30",
+      "uploadDate": "2026-09-10"
+    }
+  ]
+}
