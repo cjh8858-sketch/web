@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}발행 이력 - 네이버 블로그 자동화{% endblock %}
+
+{% block content %}
+<div class="history-page">
+    <section class="section">
+        <h2>발행 이력</h2>
+
+        <div class="filters">
+            <select id="interestFilter">
+                <option value="">모든 관심분야</option>
+            </select>
+            <select id="statusFilter">
+                <option value="">모든 상태</option>
+                <option value="success">성공</option>
+                <option value="failed">실패</option>
+            </select>
+            <button class="btn btn-secondary" onclick="loadHistory()">검색</button>
+        </div>
+
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>관심분야</th>
+                    <th>제목</th>
+                    <th>상태</th>
+                    <th>발행일시</th>
+                    <th>작업</th>
+                </tr>
+            </thead>
+            <tbody id="historyTableBody">
+                <tr class="loading">
+                    <td colspan="5">로딩 중...</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<script>
+async function loadInterests() {
+    try {
+        const response = await fetch('/api/interests');
+        const data = await response.json();
+
+        if (data.success) {
+            const select = document.getElementById('interestFilter');
+            select.innerHTML = '<option value="">모든 관심분야</option>';
+
+            data.data.forEach(interest => {
+                const option = document.createElement('option');
+                option.value = interest.id;
+                option.textContent = interest.keyword;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading interests:', error);
+    }
+}
+
+async function loadHistory() {
+    try {
+        const interestId = document.getElementById('interestFilter').value;
+        const status = document.getElementById('statusFilter').value;
+
+        let url = '/api/publish/history';
+        const params = new URLSearchParams();
+        if (interestId) params.append('interest_id', interestId);
+        if (status) params.append('status', status);
+
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.success) {
+            renderHistory(data.data);
+        } else {
+            alert('이력 로드 실패: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error loading history:', error);
+    }
+}
+
+function renderHistory(history) {
+    const tbody = document.getElementById('historyTableBody');
+
+    if (history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">발행 이력이 없습니다.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = history.map(item => `
+        <tr class="${item.status}">
+            <td>${escapeHtml(item.keyword || '-')}</td>
+            <td>
+                ${item.naver_post_url ?
+                    `<a href="${item.naver_post_url}" target="_blank">${escapeHtml(item.title || '(제목 없음)')}</a>` :
+                    escapeHtml(item.title || '(제목 없음)')}
+            </td>
+            <td>
+                <span class="status ${item.status}">
+                    ${item.status === 'success' ? '✓ 성공' : '✗ 실패'}
+                </span>
+            </td>
+            <td>${new Date(item.created_at).toLocaleString('ko-KR')}</td>
+            <td>
+                <button class="btn btn-small btn-info" onclick="showDetail(${item.id})">상세</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+async function showDetail(historyId) {
+    try {
+        const response = await fetch(`/api/publish/history/${historyId}`);
+        const data = await response.json();
+
+        if (data.success) {
+            const detail = data.data;
+            let message = `
+제목: ${detail.title || '(없음)'}
+관심분야: ${detail.keyword || '(없음)'}
+상태: ${detail.status === 'success' ? '성공' : '실패'}
+발행일시: ${new Date(detail.created_at).toLocaleString('ko-KR')}
+            `;
+
+            if (detail.status === 'failed' && detail.error_message) {
+                message += `\n\n오류: ${detail.error_message}`;
+            }
+
+            if (detail.naver_post_url) {
+                message += `\n\n블로그 주소: ${detail.naver_post_url}`;
+            }
+
+            alert(message);
+        } else {
+            alert('상세 정보 로드 실패: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error loading detail:', error);
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Load on page load
+window.addEventListener('load', () => {
+    loadInterests();
+    loadHistory();
+});
+</script>
+{% endblock %}

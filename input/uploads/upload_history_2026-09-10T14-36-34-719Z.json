@@ -1,0 +1,36 @@
+{
+  "uploadedAt": "2026-09-10T14:36:34.720Z",
+  "totalPosts": 5,
+  "posts": [
+    {
+      "id": "post_001",
+      "photoPath": "class001.jpg",
+      "captionLength": 231,
+      "status": "uploaded"
+    },
+    {
+      "id": "post_002",
+      "photoPath": "class002.jpg",
+      "captionLength": 219,
+      "status": "uploaded"
+    },
+    {
+      "id": "post_003",
+      "photoPath": "class003.jpg",
+      "captionLength": 227,
+      "status": "uploaded"
+    },
+    {
+      "id": "post_004",
+      "photoPath": "class004.jpg",
+      "captionLength": 206,
+      "status": "uploaded"
+    },
+    {
+      "id": "post_005",
+      "photoPath": "class005.jpg",
+      "captionLength": 235,
+      "status": "uploaded"
+    }
+  ]
+}
