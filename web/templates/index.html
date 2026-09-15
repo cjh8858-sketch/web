@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwritten Digit Recognition</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✍️ Handwritten Digit Recognition</h1>
+            <p class="subtitle">Draw a digit (0-9) and let AI recognize it</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Canvas Section -->
+            <div class="canvas-section">
+                <div class="canvas-wrapper">
+                    <canvas id="drawingCanvas" width="280" height="280"></canvas>
+                </div>
+                <p class="canvas-help">Draw here with your mouse</p>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="controls-section">
+                <button id="recognizeBtn" class="btn btn-recognize">Recognize</button>
+                <button id="clearBtn" class="btn btn-clear">Clear</button>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section" id="resultSection" style="display: none;">
+                <div class="result-card">
+                    <div class="result-label">Recognized Digit</div>
+                    <div class="result-digit" id="resultDigit">-</div>
+                    <div class="result-confidence" id="resultConfidence">Confidence: -</div>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Recognizing...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </div>
+
+        <div class="footer">
+            <p>Powered by TensorFlow & Flask</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/canvas.js') }}"></script>
+</body>
+</html>

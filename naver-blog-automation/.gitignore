@@ -1,0 +1,37 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+.nyc_output
+coverage
+
+# Next.js
+.next
+out
+dist
+build
+
+# Production
+*.tsbuildinfo
+
+# Misc
+.DS_Store
+*.pem
+.env.local
+.env.*.local
+
+# Database and local files
+data/
+logs/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db

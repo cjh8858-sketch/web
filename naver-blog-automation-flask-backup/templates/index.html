@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}대시보드 - 네이버 블로그 자동화{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <section class="section">
+        <h2>관심분야 관리</h2>
+
+        <div class="form-group">
+            <input type="text" id="keywordInput" placeholder="관심분야 (예: Python, 머신러닝)" maxlength="100">
+            <div class="time-picker">
+                <label>발행 시간:</label>
+                <input type="number" id="hourInput" min="0" max="23" value="9" placeholder="시간">
+                <span>:</span>
+                <input type="number" id="minuteInput" min="0" max="59" value="0" placeholder="분">
+            </div>
+            <button id="addInterestBtn" class="btn btn-primary">+ 관심분야 추가</button>
+        </div>
+
+        <table class="interests-table">
+            <thead>
+                <tr>
+                    <th>관심분야</th>
+                    <th>발행 시간</th>
+                    <th>상태</th>
+                    <th>마지막 발행</th>
+                    <th>작업</th>
+                </tr>
+            </thead>
+            <tbody id="interestsTableBody">
+                <tr class="loading">
+                    <td colspan="5">로딩 중...</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="section">
+        <h2>네이버 로그인</h2>
+        <div id="loginStatus" class="status-box">
+            <p>상태 확인 중...</p>
+        </div>
+        <button id="loginBtn" class="btn btn-secondary" style="display:none;">네이버 로그인</button>
+        <button id="logoutBtn" class="btn btn-secondary" style="display:none;">로그아웃</button>
+    </section>
+</div>
+
+<script>
+async function loadInterests() {
+    try {
+        const response = await fetch('/api/interests');
+        const data = await response.json();
+
+        if (data.success) {
+            renderInterests(data.data);
+        } else {
+            alert('관심분야 로드 실패: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error loading interests:', error);
+    }
+}
+
+function renderInterests(interests) {
+    const tbody = document.getElementById('interestsTableBody');
+
+    if (interests.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">관심분야가 없습니다.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = interests.map(interest => `
+        <tr>
+            <td>${escapeHtml(interest.keyword)}</td>
+            <td>${interest.schedule ? `${String(interest.schedule.run_hour).padStart(2, '0')}:${String(interest.schedule.run_minute).padStart(2, '0')}` : '-'}</td>
+            <td><span class="status ${interest.active ? 'active' : 'inactive'}">${interest.active ? '활성' : '비활성'}</span></td>
+            <td>${interest.schedule && interest.schedule.last_run_at ? new Date(interest.schedule.last_run_at).toLocaleString('ko-KR') : '-'}</td>
+            <td>
+                <button class="btn btn-small btn-primary" onclick="publishNow(${interest.id}, '${escapeHtml(interest.keyword)}')">🚀 발행</button>
+                <button class="btn btn-small btn-warning" onclick="editInterest(${interest.id})">수정</button>
+                <button class="btn btn-small btn-danger" onclick="deleteInterest(${interest.id})">삭제</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+document.getElementById('addInterestBtn').addEventListener('click', async () => {
+    const keyword = document.getElementById('keywordInput').value.trim();
+    const runHour = parseInt(document.getElementById('hourInput').value);
+    const runMinute = parseInt(document.getElementById('minuteInput').value);
+
+    if (!keyword) {
+        alert('관심분야를 입력해주세요.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/interests', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                keyword,
+                run_hour: runHour,
+                run_minute: runMinute
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('keywordInput').value = '';
+            loadInterests();
+        } else {
+            alert('추가 실패: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error adding interest:', error);
+    }
+});
+
+async function deleteInterest(interestId) {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+
+    try {
+        const response = await fetch(`/api/interests/${interestId}`, { method: 'DELETE' });
+        const data = await response.json();
+
+        if (data.success) {
+            loadInterests();
+        } else {
+            alert('삭제 실패: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error deleting interest:', error);
+    }
+}
+
+function editInterest(interestId) {
+    alert('수정 기능은 M7 단계에서 구현됩니다.');
+}
+
+async function checkNaverLoginStatus() {
+    try {
+        const response = await fetch('/api/auth/naver/status');
+        const data = await response.json();
+
+        if (data.success) {
+            const statusBox = document.getElementById('loginStatus');
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            if (data.is_valid) {
+                statusBox.innerHTML = '<p class="success">✓ 네이버 로그인 완료</p>';
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+            } else {
+                statusBox.innerHTML = '<p class="warning">⚠ 로그인이 필요합니다.</p>';
+                loginBtn.style.display = 'inline-block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error checking login status:', error);
+    }
+}
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/api/auth/naver/login', { method: 'POST' });
+        const data = await response.json();
+
+        if (data.success) {
+            alert('로그인 완료!');
+            checkNaverLoginStatus();
+        } else {
+            alert('로그인 실패: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error logging in:', error);
+    }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/api/auth/naver/logout', { method: 'POST' });
+        const data = await response.json();
+
+        if (data.success) {
+            alert('로그아웃 완료!');
+            checkNaverLoginStatus();
+        } else {
+            alert('로그아웃 실패: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error logging out:', error);
+    }
+});
+
+async function publishNow(interestId, keyword) {
+    if (!confirm(`"${keyword}" 주제로 지금 블로그 글을 작성하고 발행하시겠습니까?\n\n이 작업은 몇 분 소요될 수 있습니다.`)) {
+        return;
+    }
+
+    try {
+        // 먼저 로그인 상태 확인
+        const statusResponse = await fetch('/api/auth/naver/status');
+        const statusData = await statusResponse.json();
+
+        if (!statusData.is_valid) {
+            alert('먼저 네이버에 로그인해주세요.');
+            return;
+        }
+
+        // 발행 시작
+        const response = await fetch('/api/publish/now', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ interest_id: interestId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert(`발행이 시작되었습니다!\n\n진행 상황:\n1. 뉴스/블로그 콘텐츠 수집 중\n2. AI로 글 작성 중\n3. 이미지 검색 및 선정 중\n4. 네이버 블로그에 발행 중\n\n완료되면 발행 이력 페이지에서 확인할 수 있습니다.`);
+
+            // 3초 후 이력 페이지로 이동
+            setTimeout(() => {
+                window.location.href = '/history';
+            }, 3000);
+        } else {
+            alert('발행 실패: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error publishing:', error);
+        alert('발행 중 오류가 발생했습니다: ' + error.message);
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Load on page load
+window.addEventListener('load', () => {
+    loadInterests();
+    checkNaverLoginStatus();
+});
+</script>
+{% endblock %}

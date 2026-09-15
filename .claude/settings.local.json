@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(node --version)",
+      "PowerShell(claude --version)",
+      "Bash(git add *)"
+    ]
+  }
+}
