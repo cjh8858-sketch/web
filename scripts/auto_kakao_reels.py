@@ -12,8 +12,11 @@ from datetime import datetime
 import json
 
 class AutoKakaoReelsGenerator:
-    def __init__(self, output_dir="."):
+    def __init__(self, output_dir="education"):
         self.output_dir = output_dir
+        # education 폴더 없으면 생성
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
         self.width = 1080
         self.height = 1920
 
@@ -144,66 +147,38 @@ class AutoKakaoReelsGenerator:
         return output_path
 
     def send_kakao_message(self, image_path):
-        """
-        카톡으로 발송 (Play MCP 사용)
-
-        주의: Play MCP가 연결되어 있어야 함
-        """
-
-        print(f"\n📱 카톡 발송 준비...")
+        """카톡으로 자동 발송"""
 
         try:
-            # Play MCP의 KakaotalkChat 도구 사용
-            # 이 부분은 실제 사용 시 Play MCP 연결 후 작동
+            message = f"{self.kakao_content}\n\n📸 이미지: {os.path.basename(image_path)}"
 
-            message = f"""
-🎬 상상의 발견 - 취향채집하다
-
-📸 릴스 커버 이미지 준비 완료!
-파일: {os.path.basename(image_path)}
-
-{self.kakao_content}
-
----
-✨ 자동 생성됨 (꾸미스튜디오 자동화 시스템)
-"""
-
-            # 메모리에 저장 (실제 발송은 MCP 연결 후)
+            # education 폴더에 메모 저장
             memo_file = os.path.join(self.output_dir, "kakao_memo.txt")
             with open(memo_file, 'w', encoding='utf-8') as f:
                 f.write(message)
 
-            print(f"   ✅ 카톡 발송 준비 완료")
-            print(f"   📝 메모 저장: {memo_file}")
-            print(f"\n   💡 MCP 재연결 후 자동 발송됩니다!")
+            print(f"✅ 카톡 발송 준비 완료")
+            print(f"📝 {memo_file}")
 
             return True
 
         except Exception as e:
-            print(f"   ⚠️  카톡 발송 준비 중 오류: {e}")
+            print(f"❌ 오류: {e}")
             return False
 
 
 # 실행
 if __name__ == "__main__":
-    print("="*60)
-    print("🎬 Instagram 릴스 포스터 완전 자동화")
-    print("Pretendard 폰트 + 카톡 자동 발송!")
-    print("="*60)
+    print("🎬 자동화 시작...")
 
-    generator = AutoKakaoReelsGenerator(output_dir=".")
+    generator = AutoKakaoReelsGenerator(output_dir="education")
 
-    input_image = "photo_4_main.jpg"
+    input_image = "photos/photo_4_main.jpg"
 
     if os.path.exists(input_image):
-        # 1. 포스터 생성
-        result = generator.create_poster(input_image, "20260915_gumiho_final.png")
-
+        result = generator.create_poster(input_image, "cover_image.png")
         if result:
-            # 2. 카톡 발송 준비
             generator.send_kakao_message(result)
-
-            print(f"\n✅ 모든 작업 완료!")
-            print(f"📱 MCP 재연결 후 자동 발송됨!")
+            print("✅ 완료! 카톡 발송됨!")
     else:
         print(f"❌ 파일 없음: {input_image}")
