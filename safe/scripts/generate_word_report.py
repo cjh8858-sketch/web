@@ -3,12 +3,12 @@
 """
 안전보건지킴이 활동보고서 워드 파일 생성
 정확한 양식: 안전보건지킴이 사업장별 활동보고 서식 (변경 금지)
+사진 포함: 업로드된 4개 사진을 워드 파일에 삽입
 """
 
 from docx import Document
-from docx.shared import Pt, RGBColor, Cm
+from docx.shared import Pt, RGBColor, Cm, Inches
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
-from datetime import datetime
 from pathlib import Path
 
 class SafetyReportGenerator:
@@ -16,8 +16,19 @@ class SafetyReportGenerator:
         self.reports_dir = Path(__file__).parent.parent / "reports"
         self.reports_dir.mkdir(exist_ok=True)
 
-    def create_word_report(self, site_name, inspection_date, site_manager, inspector, address):
-        """정확한 양식에 따른 워드 보고서 생성"""
+    def create_word_report_with_photos(self, site_name, inspection_date, site_manager,
+                                       inspector, address, photo_paths):
+        """
+        정확한 양식에 따른 워드 보고서 생성 (실제 사진 포함)
+
+        Args:
+            site_name: 현장명
+            inspection_date: 점검일자
+            site_manager: 현장관계자
+            inspector: 점검자
+            address: 현장소재지
+            photo_paths: 사진 경로 리스트 (4개) [사진1, 사진2, 사진3, 사진4]
+        """
 
         doc = Document()
 
@@ -32,9 +43,15 @@ class SafetyReportGenerator:
         # ===== 제목 =====
         title = doc.add_paragraph()
         title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-        title_run = title.add_run("2026년 안전보건지킴이 현장점검 활동보고")
-        title_run.font.size = Pt(14)
+        title_run = title.add_run("붙임3 안전보건지킴이 사업장별 활동보고 서식")
+        title_run.font.size = Pt(12)
         title_run.font.bold = True
+
+        title2 = doc.add_paragraph()
+        title2.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        title2_run = title2.add_run("2026년 안전보건지킴이 현장점검 활동보고")
+        title2_run.font.size = Pt(14)
+        title2_run.font.bold = True
 
         doc.add_paragraph()
 
@@ -70,35 +87,67 @@ class SafetyReportGenerator:
         # ===== 점검내용 및 조치사항 =====
         doc.add_paragraph("□ 점검내용 및 조치사항 (항목별)")
 
-        # 8가지 체크포인트 (정확한 현장점검표 양식)
+        # 체크포인트 정보
         checkpoints = [
-            "○ 작업전 TBM실시 및 근로자 안전교육 상태",
-            "○ 안전담당자(관리감독자) 현장배치 여부 및 현장 지휘·감독 상태",
-            "○ 안전모(턱끈 포함), 안전화 등 보호구 지급·착용 상태",
-            "○ 굴삭기, 지게차 등 작업 반경 내 신호수(유도자) 배치 여부",
-            "○ 2m 이상 고소작업 시 안전대 체결 여부 확인",
-            "○ 작업발판 및 통로 단부에 안전난간이 견고한지 여부",
-            "○ 비계 기둥 하부에 침하방지 조치(받침철물 등) 상태",
-            "○ 작업장 및 이동 통로에 넘어질 우려가 되는 자재, 폐기물 정리 상태"
+            ("작업전 TBM실시 및 근로자 안전교육 상태", "안전교육 & TBM"),
+            ("안전담당자(관리감독자) 현장배치 여부 및 현장 지휘·감독 상태", "안전담당자 배치"),
+            ("안전모(턱끈 포함), 안전화 등 보호구 지급·착용 상태", "개인보호구"),
+            ("굴삭기, 지게차 등 작업 반경 내 신호수(유도자) 배치 여부", "신호수 배치"),
+            ("2m 이상 고소작업 시 안전대 체결 여부 확인", "고소작업 안전"),
+            ("작업발판 및 통로 단부에 안전난간이 견고한지 여부", "난간 안전"),
+            ("비계 기둥 하부에 침하방지 조치(받침철물 등) 상태", "비계 안전"),
+            ("작업장 및 이동 통로에 넘어질 우려가 되는 자재, 폐기물 정리 상태", "정리정돈")
         ]
 
-        for i, checkpoint in enumerate(checkpoints):
-            p = doc.add_paragraph(checkpoint)
-            p.paragraph_format.left_indent = Cm(0.3)
-
-            # 내용 테이블 (2행 x 2열: 좌측 우측)
+        # 4개 그룹 (8개 체크포인트)
+        for group_idx in range(4):
+            # 4행 x 2열 테이블
             content_table = doc.add_table(rows=2, cols=2)
             content_table.style = 'Table Grid'
 
             # 1행: 위험요인 및 개선사항
             cells = content_table.rows[0].cells
-            cells[0].text = "‣ 중점관리 위험요인 및 개선사항\n‣ 보완 후 재점검 필요사항... ‣ 모범사례 등... 작성"
-            cells[1].text = "‣ 중점관리 위험요인 및 개선사항\n‣ 보완 후 재점검 필요사항... ‣ 모범사례 등... 작성"
+
+            # 좌측 (체크포인트 1)
+            cp1_idx = group_idx * 2
+            if cp1_idx < len(checkpoints):
+                cp1_text, cp1_label = checkpoints[cp1_idx]
+                cells[0].text = f"‣ 중점관리 항목별 위험요인 및 개선사항\n‣ 보완 후 재점검 필요사항... ‣ 모범사례 등... 작성"
+
+            # 우측 (체크포인트 2)
+            cp2_idx = group_idx * 2 + 1
+            if cp2_idx < len(checkpoints):
+                cp2_text, cp2_label = checkpoints[cp2_idx]
+                cells[1].text = f"‣ 중점관리 항목별 위험요인 및 개선사항\n‣ 보완 후 재점검 필요사항... ‣ 모범사례 등... 작성"
 
             # 2행: 사진
             cells = content_table.rows[1].cells
-            cells[0].text = "현장점검 사진"
-            cells[1].text = "현장점검 사진"
+
+            # 좌측 사진 (사진 1, 3)
+            left_photo_idx = group_idx * 2
+            if left_photo_idx < len(photo_paths) and photo_paths[left_photo_idx]:
+                try:
+                    cells[0].text = ""
+                    paragraph = cells[0].paragraphs[0]
+                    run = paragraph.add_run()
+                    run.add_picture(str(photo_paths[left_photo_idx]), width=Inches(2.5))
+                except Exception as e:
+                    cells[0].text = f"현장점검 사진 {left_photo_idx + 1}"
+            else:
+                cells[0].text = f"현장점검 사진 {left_photo_idx + 1}"
+
+            # 우측 사진 (사진 2, 4)
+            right_photo_idx = group_idx * 2 + 1
+            if right_photo_idx < len(photo_paths) and photo_paths[right_photo_idx]:
+                try:
+                    cells[1].text = ""
+                    paragraph = cells[1].paragraphs[0]
+                    run = paragraph.add_run()
+                    run.add_picture(str(photo_paths[right_photo_idx]), width=Inches(2.5))
+                except Exception as e:
+                    cells[1].text = f"현장점검 사진 {right_photo_idx + 1}"
+            else:
+                cells[1].text = f"현장점검 사진 {right_photo_idx + 1}"
 
         doc.add_paragraph()
 
@@ -163,12 +212,14 @@ def main():
     """테스트 실행"""
     generator = SafetyReportGenerator()
 
-    doc = generator.create_word_report(
+    # 사진이 없을 때 테스트 (None 전달)
+    doc = generator.create_word_report_with_photos(
         site_name="효자~상원간도로 건설공사",
         inspection_date="2026-09-15",
         site_manager="홍길동((주)두산건설)",
         inspector="경북 안전보건지킴이 5조",
-        address="경북 포항시 남구 송도동 253-125번지"
+        address="경북 포항시 남구 송도동 253-125번지",
+        photo_paths=[None, None, None, None]  # 실제 사진 경로로 대체
     )
 
     filepath = generator.save_report(doc, "효자상원간도로", "2026-09-15")
