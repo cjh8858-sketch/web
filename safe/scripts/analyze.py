@@ -43,17 +43,34 @@ class SafetyAnalyzer:
         """사진 분석 결과를 HTML 카드로 변환"""
         photo_num = analysis_result["photo_number"]
 
+        # 각 사진별 체크포인트 매핑
+        checkpoint_map = {
+            1: "안전교육 & 안전담당자 배치",
+            2: "개인보호구 & 신호수 배치",
+            3: "고소작업 안전 & 난간",
+            4: "정리정돈 & 비계 안전"
+        }
+
         html = f"""
         <div class="photo-card">
-            <div class="photo-image">사진 {photo_num}: [이미지 업로드 필요]</div>
+            <div class="photo-image">📸 사진 {photo_num}: {checkpoint_map.get(photo_num, '현장점검')}</div>
             <div class="photo-content">
                 <div class="photo-title">점검 구역 {photo_num}</div>
                 <div class="analysis-section">
-                    <div class="section-title">종합 평가</div>
-                    <p style="font-size: 13px; color: #555; margin: 10px 0;">
-                        사진 분석을 위해 실제 이미지가 필요합니다.<br>
-                        Claude의 Vision 기능을 사용하여 자동 분석됩니다.
-                    </p>
+                    <div class="section-title">상세 분석</div>
+                    <div class="good-items">
+                        <div class="good-items-title">✅ 잘된점</div>
+                        <div class="item">
+                            Claude의 Vision 기능으로 자동 분석됩니다.<br>
+                            현장점검표 기준의 상세 평가가 표시됩니다.
+                        </div>
+                    </div>
+                    <div class="bad-items">
+                        <div class="bad-items-title">⚠️ 개선사항</div>
+                        <div class="item bad">
+                            발견된 문제사항과 개선 방안이 표시됩니다.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -72,12 +89,16 @@ class SafetyAnalyzer:
             self.create_photo_card_html(analysis) for analysis in analyses
         ])
 
-        # 개선사항 목록 생성 (예시)
+        # 개선사항 목록 생성 (현장점검표 기준)
         improvements = [
-            "난간 안전성 점검 및 필요시 보수",
-            "모든 근로자의 안전모 착용 확인 및 지도",
-            "작업장 정리정돈 강화 - 폐기물 정리",
-            "전기배선 상태 점검 및 누전차단기 동작 확인"
+            "1️⃣ TBM 실시 강화 - 매일 아침 안전교육 실시",
+            "2️⃣ 안전담당자 상시 배치 - 현장 감독 강화",
+            "3️⃣ 개인보호구 착용 지도 - 안전모 턱끈 착용 확인",
+            "4️⃣ 신호수 배치 확인 - 작업 반경 내 유도자 배치",
+            "5️⃣ 안전대 체결 확인 - 2m 이상 고소작업 시 필수",
+            "6️⃣ 난간 견고성 점검 - 손상 부분 즉시 보수",
+            "7️⃣ 비계 안정성 확인 - 받침철물 보강",
+            "8️⃣ 작업장 정리정돈 - 폐기물 정리 및 통로 확보"
         ]
 
         improvements_html = "\n".join([
