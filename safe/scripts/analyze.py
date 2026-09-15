@@ -107,7 +107,13 @@ class SafetyAnalyzer:
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(html_content)
 
-        return filepath
+        # 사용자 친화적인 정보 반환
+        return {
+            "filename": filename,
+            "filepath": str(filepath),
+            "relative_path": f"safe/reports/{filename}",
+            "html_content": html_content
+        }
 
 
 def main():
