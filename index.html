@@ -76,94 +76,6 @@
             font-size: 14px;
         }
 
-        /* 캘린더 */
-        .calendar-section {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .calendar-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .calendar-nav {
-            display: flex;
-            gap: 10px;
-        }
-
-        .calendar-nav button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-
-        .calendar-nav button:hover {
-            background: #2980b9;
-        }
-
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-        }
-
-        .calendar-day-header {
-            text-align: center;
-            font-weight: 600;
-            color: #666;
-            font-size: 12px;
-            padding: 8px 0;
-        }
-
-        .calendar-day {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            background: white;
-            border: 1px solid #ddd;
-            transition: all 0.2s;
-        }
-
-        .calendar-day:hover {
-            background: #e8f4f8;
-        }
-
-        .calendar-day.other-month {
-            color: #ccc;
-        }
-
-        .calendar-day.selected {
-            background: #3498db;
-            color: white;
-            font-weight: 600;
-            border-color: #3498db;
-        }
-
-        .calendar-day.today {
-            border: 2px solid #e74c3c;
-            font-weight: 600;
-        }
-
         /* 입력 섹션 */
         .input-section {
             display: flex;
@@ -243,6 +155,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            margin-bottom: 30px;
         }
 
         .empty-state {
@@ -361,6 +274,108 @@
             background: #229954;
         }
 
+        /* 캘린더 */
+        .calendar-section {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .calendar-nav button:hover {
+            background: #2980b9;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            position: relative;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            padding: 8px 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            background: white;
+            border: 1px solid #ddd;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: #e8f4f8;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+
+        .calendar-day.selected {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+            border-color: #3498db;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #e74c3c;
+            font-weight: 600;
+        }
+
+        .calendar-day.has-todo::before {
+            content: '●';
+            position: absolute;
+            bottom: 1px;
+            font-size: 8px;
+            color: #e74c3c;
+        }
+
+        .calendar-day.has-todo.selected::before {
+            color: white;
+        }
+
         /* 모달 */
         .modal {
             display: none;
@@ -468,18 +483,6 @@
                 </div>
             </div>
 
-            <!-- 캘린더 -->
-            <div class="calendar-section">
-                <div class="calendar-header">
-                    <div class="calendar-title" id="calendarTitle">2026년 9월</div>
-                    <div class="calendar-nav">
-                        <button onclick="app.prevMonth()">◀</button>
-                        <button onclick="app.nextMonth()">▶</button>
-                    </div>
-                </div>
-                <div class="calendar" id="calendar"></div>
-            </div>
-
             <!-- 입력 섹션 -->
             <div class="input-section">
                 <input
@@ -506,6 +509,18 @@
 
             <!-- 할 일 목록 -->
             <div class="todos-list" id="todosList"></div>
+
+            <!-- 캘린더 -->
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <div class="calendar-title" id="calendarTitle">2026년 9월</div>
+                    <div class="calendar-nav">
+                        <button onclick="app.prevMonth()">◀</button>
+                        <button onclick="app.nextMonth()">▶</button>
+                    </div>
+                </div>
+                <div class="calendar" id="calendar"></div>
+            </div>
         </div>
     </div>
 
@@ -559,7 +574,6 @@
                 this.renderCalendar();
                 this.render();
 
-                // 엔터 키 바인딩
                 document.getElementById('todoInput').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addTodo();
                 });
@@ -608,6 +622,12 @@
                     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                     const selectedStr = this.getDateString(this.selectedDate);
 
+                    // 이 날짜에 할 일이 있는지 확인
+                    const hasTodo = this.todos.some(t => t.dueDate === dateStr);
+                    if (hasTodo) {
+                        dayEl.classList.add('has-todo');
+                    }
+
                     if (dateStr === selectedStr) {
                         dayEl.classList.add('selected');
                     }
@@ -622,7 +642,7 @@
                 }
 
                 // 다음 월의 날짜
-                const totalCells = 42; // 6주 * 7일
+                const totalCells = 42;
                 const filledCells = calendar.children.length;
                 for (let day = 1; day <= totalCells - filledCells; day++) {
                     const dayEl = document.createElement('div');
@@ -811,7 +831,6 @@
                     filtered = filtered.filter(t => t.category === this.currentFilter);
                 }
 
-                // 카테고리별로 정렬 후 order로 정렬
                 const categories = ['업무', '개인', '공부'];
                 const sorted = [];
                 categories.forEach(category => {
@@ -833,6 +852,7 @@
 
             render() {
                 this.updateProgress();
+                this.renderCalendar();
 
                 const todosList = document.getElementById('todosList');
                 const filtered = this.getFilteredTodos();
@@ -904,7 +924,6 @@
             }
         };
 
-        // 앱 초기화
         app.init();
     </script>
 </body>
